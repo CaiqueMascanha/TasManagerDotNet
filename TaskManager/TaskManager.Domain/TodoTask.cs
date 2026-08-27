@@ -44,6 +44,7 @@ public sealed class TodoTask
         Description = null!;
     }
 
+    // Comportamentos / Regras de Negócio (Evitando Domínio Anêmico)
     public void Complete()
     {
         if (IsCompleted)

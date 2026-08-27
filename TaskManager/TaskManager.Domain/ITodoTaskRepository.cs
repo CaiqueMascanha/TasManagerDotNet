@@ -10,9 +10,9 @@ namespace TaskManager.Domain;
 /// </summary>
 public interface ITodoTaskRepository
 {
-    Task<TodoTask?> GetByIdAsync(Guid id);
-    Task<IEnumerable<TodoTask>> GetAllAsync();
-    Task AddAsync(TodoTask task);
-    Task UpdateAsync(TodoTask task);
-    Task DeleteAsync(TodoTask task);
+    Task<TodoTask?> GetTaskByIdAsync(Guid id);
+    Task<IEnumerable<TodoTask>> GetAllTaskAsync();
+    Task AddTaskAsync(TodoTask task);
+    Task UpdateTaskAsync(TodoTask task);
+    Task DeleteTaskAsync(TodoTask task);
 }
