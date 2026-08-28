@@ -1,22 +1,27 @@
 trigger:
   branches:
     include:
-      - master # A esteira será disparada automaticamente a cada commit na branch master
+      - master
 
 pool:
-  vmImage: 'ubuntu-latest' # Agente hospedado pela Microsoft rodando Linux
+  vmImage: 'ubuntu-latest'
 
 variables:
   buildConfiguration: 'Release'
   imageRepository: 'taskmanager-api'
-  # Nota: No Passo 7 preencheremos a conexão com o Azure Container Registry (ACR)
 
 stages:
+  # ========================================================
+  # STAGE 1 - CI
+  # ========================================================
+
   - stage: BuildAndTest
     displayName: 'Estágio de Compilação e Testes'
+
     jobs:
       - job: BuildJob
         displayName: 'Build & Restauração do .NET 10'
+
         steps:
           - task: UseDotNet@2
             displayName: 'Instalar o SDK do .NET 10'
@@ -24,32 +29,47 @@ stages:
               version: '10.x'
 
           - task: DotNetCoreCLI@2
-            displayName: 'Restaurar dependências (dotnet restore)'
+            displayName: 'Restaurar dependências'
             inputs:
               command: 'restore'
               projects: '**/*.csproj'
 
           - task: DotNetCoreCLI@2
-            displayName: 'Compilar Solução (dotnet build)'
+            displayName: 'Compilar Solução'
             inputs:
               command: 'build'
               projects: '**/*.csproj'
               arguments: '--configuration $(buildConfiguration)'
 
+  # ========================================================
+  # STAGE 2 - DOCKER
+  # ========================================================
+
   - stage: DockerBuild
     displayName: 'Estágio de Empacotamento Docker'
+
     dependsOn: BuildAndTest
+
     jobs:
       - job: DockerBuildJob
         displayName: 'Build da Imagem Docker'
+
         steps:
           - task: Docker@2
             displayName: 'Gerar Imagem Docker localmente'
+
             inputs:
               command: 'build'
-              Dockerfile: '**/Dockerfile'
-              buildContext: '$(Build.SourcesDirectory)' # ◄--- ADICIONE ESTA LINHA AQUI!
+
+              Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+
+              # IMPORTANTE:
+              # O contexto precisa ser a pasta onde estão
+              # TaskManager.API, Domain e Infrastructure.
+              buildContext: '$(Build.SourcesDirectory)/TaskManager'
+
               repository: '$(imageRepository)'
+
               tags: |
                 $(Build.BuildId)
                 latest
