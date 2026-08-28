@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManager.API.DTOs;
 using TaskManager.Domain;
 
 namespace TaskManager.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public sealed class TodoTasksController : ControllerBase
